@@ -1,0 +1,10 @@
+[Unit]
+Description=Get data from the iWatch, and stores the data into a database.
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/bash /TODO/run.sh /TODO/.env
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
