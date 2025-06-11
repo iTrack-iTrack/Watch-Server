@@ -2,6 +2,7 @@ import sql
 
 import datetime
 import json
+import os
 import requests
 import socket
 import threading
@@ -27,7 +28,7 @@ def handle(client, address, conn, db):
                 continue
 
             date_time = datetime.datetime.now()
-            with open("{}/{}".format(os.getenv("DB_PATH"), date_time), "w") as f:
+            with open("{}/{}".format(os.getenv("PAYLOAD_FOLDER"), date_time), "w") as f:
                 f.write(message)
 
             msg = message.decode().rstrip()
