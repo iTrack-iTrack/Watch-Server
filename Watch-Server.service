@@ -3,7 +3,7 @@ Description=Get data from the iWatch, and stores the data into a database.
 After=multi-user.target
 
 [Service]
-ExecStart=/srv/Watch-Sync/build/bin/python3 /srv/Watch-Sync/src/main.py
+ExecStart=/srv/Watch-Server/build/bin/python3 /srv/Watch-Server/src/main.py
 Type=simple
 
 [Install]
