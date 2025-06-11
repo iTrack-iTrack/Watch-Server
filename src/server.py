@@ -26,6 +26,10 @@ def handle(client, address, conn, db):
             if not message:
                 continue
 
+            date_time = datetime.datetime.now()
+            with open("{}/{}".format(os.getenv("DB_PATH"), date_time), "w") as f:
+                f.write(message)
+
             msg = message.decode().rstrip()
             try:
                 js = json.loads(msg)
@@ -34,7 +38,7 @@ def handle(client, address, conn, db):
 
                 insert = "date_time"
                 values = "?"
-                tuples = (datetime.datetime.now(),)
+                tuples = (date_time,)
 
                 for item in arr:
                     if not item in js:
