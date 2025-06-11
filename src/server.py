@@ -34,6 +34,7 @@ def handle(client, address, conn, db):
             msg = message.decode().rstrip()
             try:
                 js = json.loads(msg)
+                js["date_time"] = date_time
 
                 arr = ["user_id", "step", "fall", "temperature", "latitude", "longitude", "bpm", "blood_oxygen"]
 
