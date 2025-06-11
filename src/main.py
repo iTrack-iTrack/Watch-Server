@@ -2,6 +2,7 @@ import server
 import sql
 
 import dotenv
+import threading
 
 def main():
     dotenv.load_dotenv()
@@ -11,14 +12,10 @@ def main():
 
     try:
         while True:
-            msg = server.receive(s)
-            if msg == None:
-                continue
+            client, address = s.accept()
 
-            print(msg)
-
-            for row in db.execute("SELECT * FROM sensor_readings"):
-                print(row)
+            threading.Thread(target=server.handle, args=(client, address, conn, db)).start()
+            
     except KeyboardInterrupt:
         print("Exiting...")
 

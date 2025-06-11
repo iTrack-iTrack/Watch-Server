@@ -1,25 +1,65 @@
+import sql
+
+import datetime
+import json
+import requests
 import socket
+import threading
 
 def initialise():
-    server = socket.socket()
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    host = ""
     port = 8081
 
-    server.bind(("",port))
-    server.listen(5)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    server.settimeout(1)
+    server.bind((host,port))
+    server.listen(5)
 
     return server
 
-def receive(server):
+def handle(client, address, conn, db):
     try:
-        client, address = server.accept()
+        while client:
+            message = client.recv(1024)
 
-        message = client.recv(1024).decode().rstrip()
+            if not message:
+                continue
 
-        return message
+            msg = message.decode().rstrip()
+            try:
+                js = json.loads(msg)
+
+                arr = ["user_id", "step", "fall", "temperature", "latitude", "longitude", "bpm", "blood_oxygen"]
+
+                insert = "date_time"
+                values = "?"
+                tuples = (datetime.datetime.now(),)
+
+                for item in arr:
+                    if not item in js:
+                        continue
+
+                    insert += ", {}".format(item)
+                    values += ", ?"
+                    tuples += (js[item],)
+
+                query = "INSERT INTO sensor_data ({}) VALUES ({});".format(insert, values)
+                db.execute(query, tuples)
+                conn.commit()
+
+                r = requests.post("http://itrackandi.watch:8082/{}/live".format(js["user_id"]), json=js, timeout=5)
+                r.raise_for_status()
+
+            except Exception as e:
+                print("Exception Ignored at Client {}:{} - {}".format(address[0], address[1], e));
+
     except socket.timeout:
-        return None
+        pass
+    except Exception as e:
+        print("Exception Caught at Client {}:{} - {}".format(address[0], address[1], e));
+    finally:
+        client.close()
 
 def terminate(server):
     server.close()
